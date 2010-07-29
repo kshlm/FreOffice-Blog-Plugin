@@ -22,7 +22,7 @@ QString documentExtractor::getBody(QString &filePath)
 {
     KUrl url;
     url.setPath(filePath);
-    QString mimetype = KMimeType::findByUrl()->name();
+    QString mimetype = KMimeType::findByUrl(url)->name();
     KoDocument *kdoc = KParts::ComponentFactory::createPartInstanceFromQuery<KoDocument>(mimetype, QString::null);
     kdoc->openUrl(url);
     KoView *koview = kdoc->createView();
@@ -37,7 +37,7 @@ QString documentExtractor::getBody(QString &filePath)
     removeColor(bodyNode);
 
     QString body;
-    QTextStream ts(body);
+    QTextStream ts(&body);
     bodyNode.save(ts, 0);
 
     removeTags(body);

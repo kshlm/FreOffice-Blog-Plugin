@@ -18,6 +18,9 @@ protected:
 
 private:
     Ui::mainDialog *ui;
+
+private slots:
+    void showSettingsDialog();
 };
 
 #endif // MAINDIALOG_H

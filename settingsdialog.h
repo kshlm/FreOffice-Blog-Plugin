@@ -3,6 +3,11 @@
 
 #include <QDialog>
 
+class QMaemo5ValueButton;
+class QPushButton;
+class QStandardItemModel;
+class QMaemo5ListPickSelector;
+
 namespace Ui {
     class settingsDialog;
 }
@@ -13,11 +18,20 @@ public:
     settingsDialog(QWidget *parent = 0);
     ~settingsDialog();
 
-protected:
-    void changeEvent(QEvent *e);
-
 private:
-    Ui::settingsDialog *ui;
+    void setupDialog();
+    void fillAccounts();
+
+    QMaemo5ValueButton *accountButton;
+    QMaemo5ListPickSelector *selector;
+    QPushButton *newButton;
+    QPushButton *editButton;
+    QStandardItemModel *list;
+
+private slots:
+    void newButtonClicked();
+    void editButtonClicked();
+
 };
 
 #endif // SETTINGSDIALOG_H

@@ -30,16 +30,16 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="accountsButton">
        <property name="text">
         <string>Accounts</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="postButton">
        <property name="text">
-        <string>Blog</string>
+        <string>New Post</string>
        </property>
       </widget>
      </item>
