@@ -24,10 +24,13 @@ private:
     QLineEdit *passwordEdit;
 
     void setupDialog();
+    void fillDetails(QString &);
+    void disableWidgets();
+    void enableWidgets();
 
 private slots:
-    void platformSelected(const QString &);
-    void saveAccount();
+    void saveButtonClicked();
+    void saveAccount(int blogId);
 };
 
 #endif // ACCOUNTEDITDIALOG_H

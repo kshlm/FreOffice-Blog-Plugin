@@ -9,7 +9,8 @@
 #include <QHBoxLayout>
 #include <QStandardItem>
 #include <QStandardItemModel>
-
+#include <QSettings>
+#include <QDebug>
 settingsDialog::settingsDialog(QWidget *parent) :
     QDialog(parent)
 {
@@ -41,13 +42,19 @@ void settingsDialog::setupDialog()
 
 void settingsDialog::fillAccounts()
 {
-    list = new QStandardItemModel(this);
-    for( int i = 0; i < 10; i++) {
-        QStandardItem *item = new QStandardItem(QString::number(i));
-        list->appendRow(item);
+    QSettings settings("freoffice", "blog-plugin");
+    settings.beginGroup("Accounts");
+    QStringList accounts = settings.childKeys();
+    QStandardItemModel *model = new QStandardItemModel(this);
+    foreach(QString accountKey, accounts) {
+        QVariantMap account = settings.value(accountKey).value<QVariantMap>();
+        QStandardItem *item = new QStandardItem(account.value("blogurl").toString());
+        accountsList.insert(account.value("blogurl").toString(), accountKey);
+        qDebug() << accountKey << account.value("blogurl").toString() << account;
+        model->appendRow(item);
     }
     selector = new QMaemo5ListPickSelector;
-    selector->setModel(list);
+    selector->setModel(model);
     selector->setCurrentIndex(0);
     accountButton->setPickSelector(selector);
 }
@@ -60,6 +67,8 @@ void settingsDialog::newButtonClicked()
 
 void settingsDialog::editButtonClicked()
 {
-    accountEditDialog *aed = new accountEditDialog(this);
+    qDebug() << accountButton->valueText();
+    QString blog = accountsList.value(accountButton->valueText());
+    accountEditDialog *aed = new accountEditDialog(blog,this);
     aed->show();
 }

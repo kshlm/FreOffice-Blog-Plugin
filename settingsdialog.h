@@ -2,6 +2,7 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QMap>
 
 class QMaemo5ValueButton;
 class QPushButton;
@@ -26,7 +27,7 @@ private:
     QMaemo5ListPickSelector *selector;
     QPushButton *newButton;
     QPushButton *editButton;
-    QStandardItemModel *list;
+    QMap<QString, QString> accountsList;
 
 private slots:
     void newButtonClicked();

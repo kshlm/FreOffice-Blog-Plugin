@@ -25,7 +25,8 @@ HEADERS += libmaia/maiaFault.h \
     maindialog.h \
     settingsdialog.h \
     documentextractor.h \
-    accounteditdialog.h
+    accounteditdialog.h \
+    postdialog.h
 SOURCES += libmaia/maiaFault.cpp \
     libmaia/maiaObject.cpp \
     libmaia/maiaXmlRpcClient.cpp \
@@ -37,5 +38,6 @@ SOURCES += libmaia/maiaFault.cpp \
     maindialog.cpp \
     settingsdialog.cpp \
     documentextractor.cpp \
-    accounteditdialog.cpp
+    accounteditdialog.cpp \
+    postdialog.cpp
 FORMS += maindialog.ui

@@ -1,7 +1,8 @@
 #include "accounteditdialog.h"
-
+#include "wordpressapi.h"
 #include <QMaemo5ValueButton>
 #include <QMaemo5ListPickSelector>
+#include <QMaemo5InformationBox>
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
@@ -26,6 +27,7 @@ accountEditDialog::accountEditDialog(QString &blog, QWidget *parent):
 {
     setupDialog();
     this->setWindowTitle("Edit Account");
+    fillDetails(blog);
     qDebug() << blog;
 }
 
@@ -68,25 +70,63 @@ void accountEditDialog::setupDialog()
     blogPlatform->setPickSelector(selector);
     blogUrlEdit->setInputMethodHints(Qt::ImhNoAutoUppercase);
     usernameEdit->setInputMethodHints(Qt::ImhNoAutoUppercase);
-    connect(selector, SIGNAL(selected(const QString &)), this, SLOT(platformSelected(const QString&)));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveAccount()));
+    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
 }
 
-void accountEditDialog::platformSelected(const QString &value)
+void accountEditDialog::fillDetails(QString & blog)
 {
-    qDebug() << selector->currentIndex() << value ;
+    QSettings settings("freoffice", "blog-plugin");
+    settings.beginGroup("Accounts");
+    QVariantMap map = settings.value(blog).value<QVariantMap>();
+    blogUrlEdit->setText(map.value("blogurl").toString());
+    usernameEdit->setText(map.value("username").toString());
+    passwordEdit->setText(map.value("password").toString());
 }
 
-void accountEditDialog::saveAccount()
+void accountEditDialog::saveButtonClicked()
 {
+    if("" == blogUrlEdit->text() | "" == usernameEdit->text() | "" == passwordEdit->text()) {
+        QMaemo5InformationBox::information(this, "Please enter all details", QMaemo5InformationBox::DefaultTimeout);
+        return;
+    }
+    QString blogUrl = blogUrlEdit->text();
+    QString username = usernameEdit->text();
+    QString password = passwordEdit->text();
+    wordpressApi *api = new wordpressApi(blogUrl, this);
+    api->setUsername(username);
+    api->setPassword(password);
+    api->getBlogid();
+    connect(api, SIGNAL(getBlogidSignal(int)), this, SLOT(saveAccount(int)));
+    disableWidgets();
+}
+
+void accountEditDialog::saveAccount(int blogId)
+{
+    if(0 == blogId) {
+        QMaemo5InformationBox::information(this, "Failed to fetch blogid.\nCheck the details again.", QMaemo5InformationBox::NoTimeout);
+        enableWidgets();
+        return;
+    }
     QSettings settings("freoffice","blog-plugin", this);
     settings.beginGroup("Accounts");
     QVariantMap map;
     map.insert("platform", selector->currentValueText());
     map.insert("blogurl", QString(blogUrlEdit->text()));
+    map.insert("blogid", blogId);
     map.insert("username", QString(usernameEdit->text()));
     map.insert("password", QString(passwordEdit->text()));
-    settings.setValue(selector->currentValueText() + blogUrlEdit->text(), map);
+    settings.setValue(selector->currentValueText() + QString::number(blogId), map);
     settings.endGroup();
     settings.sync();
+    enableWidgets();
+}
+
+void accountEditDialog::disableWidgets()
+{
+    this->setDisabled(true);
+}
+
+void accountEditDialog::enableWidgets()
+{
+    this->setEnabled(true);
 }
