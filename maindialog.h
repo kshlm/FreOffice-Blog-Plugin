@@ -21,6 +21,7 @@ private:
 
 private slots:
     void showSettingsDialog();
+    void showPostDialog();
 };
 
 #endif // MAINDIALOG_H

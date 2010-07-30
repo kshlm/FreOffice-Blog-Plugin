@@ -2,6 +2,7 @@
 #include "ui_maindialog.h"
 
 #include "settingsdialog.h"
+#include "postdialog.h"
 
 mainDialog::mainDialog(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +11,7 @@ mainDialog::mainDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("FOBlog");
     connect(ui->accountsButton, SIGNAL(clicked()), this, SLOT(showSettingsDialog()));
+    connect(ui->postButton, SIGNAL(clicked()), this, SLOT(showPostDialog()));
 }
 
 mainDialog::~mainDialog()
@@ -33,5 +35,10 @@ void mainDialog::showSettingsDialog()
 {
     settingsDialog *sd = new settingsDialog(this);
     sd->show();
-    this->setVisible(false);
+}
+
+void mainDialog::showPostDialog()
+{
+    postDialog *pd = new postDialog(this);
+    pd->show();
 }
