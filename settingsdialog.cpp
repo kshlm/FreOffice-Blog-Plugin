@@ -47,10 +47,8 @@ void settingsDialog::fillAccounts()
     QStringList accounts = settings.childKeys();
     QStandardItemModel *model = new QStandardItemModel(this);
     foreach(QString accountKey, accounts) {
-        QVariantMap account = settings.value(accountKey).value<QVariantMap>();
-        QStandardItem *item = new QStandardItem(account.value("blogurl").toString());
-        accountsList.insert(account.value("blogurl").toString(), accountKey);
-        qDebug() << accountKey << account.value("blogurl").toString() << account;
+        QStandardItem *item = new QStandardItem(accountKey);
+        qDebug() << accountKey;
         model->appendRow(item);
     }
     selector = new QMaemo5ListPickSelector;
@@ -68,7 +66,7 @@ void settingsDialog::newButtonClicked()
 void settingsDialog::editButtonClicked()
 {
     qDebug() << accountButton->valueText();
-    QString blog = accountsList.value(accountButton->valueText());
+    QString blog = accountButton->valueText();
     accountEditDialog *aed = new accountEditDialog(blog,this);
     aed->show();
 }

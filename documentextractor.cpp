@@ -26,7 +26,9 @@ QString documentExtractor::getBody(QString &filePath)
     KoDocument *kdoc = KParts::ComponentFactory::createPartInstanceFromQuery<KoDocument>(mimetype, QString::null);
     kdoc->openUrl(url);
     KoView *koview = kdoc->createView();
+    koview->unsetCursor();
     KWView *kwview = qobject_cast<KWView *>(koview);
+    kwview->unsetCursor();
     KoTextEditor *editor = qobject_cast<KoTextEditor *>(kwview->kwcanvas()->toolProxy()->selection());
     QTextDocument *tdoc = editor->document();
     QString data = tdoc->toHtml();

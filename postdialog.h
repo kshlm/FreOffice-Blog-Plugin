@@ -21,6 +21,8 @@ public:
 private:
     void setupDialog();
     void fillAccounts();
+    void disableDialog();
+    void enableDialog();
 
     QMaemo5ValueButton *accountButton;
     QMaemo5ListPickSelector *selector;
@@ -30,7 +32,12 @@ private:
     QLineEdit *categoryEdit;
     QPushButton *selectButton;
     QPushButton *postButton;
-    QMap<QString, QString> accountsList;
+
+private slots:
+    void showOpenFileDialog();
+    void postButtonClicked();
+    void newPostSignalSlot(int);
+
 };
 
 #endif // POSTDIALOG_H

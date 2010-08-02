@@ -115,7 +115,7 @@ void accountEditDialog::saveAccount(int blogId)
     map.insert("blogid", blogId);
     map.insert("username", QString(usernameEdit->text()));
     map.insert("password", QString(passwordEdit->text()));
-    settings.setValue(selector->currentValueText() + QString::number(blogId), map);
+    settings.setValue(QString(blogUrlEdit->text()).remove("http://"), map);
     settings.endGroup();
     settings.sync();
     enableWidgets();

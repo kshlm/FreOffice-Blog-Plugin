@@ -27,7 +27,6 @@ private:
     QMaemo5ListPickSelector *selector;
     QPushButton *newButton;
     QPushButton *editButton;
-    QMap<QString, QString> accountsList;
 
 private slots:
     void newButtonClicked();
