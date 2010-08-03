@@ -40,5 +40,5 @@ void mainDialog::showSettingsDialog()
 void mainDialog::showPostDialog()
 {
     postDialog *pd = new postDialog(this);
-    pd->show();
+//    pd->show();
 }

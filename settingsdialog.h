@@ -8,7 +8,7 @@ class QMaemo5ValueButton;
 class QPushButton;
 class QStandardItemModel;
 class QMaemo5ListPickSelector;
-
+class accountEditDialog;
 namespace Ui {
     class settingsDialog;
 }
@@ -21,14 +21,15 @@ public:
 
 private:
     void setupDialog();
-    void fillAccounts();
 
     QMaemo5ValueButton *accountButton;
     QMaemo5ListPickSelector *selector;
     QPushButton *newButton;
     QPushButton *editButton;
+    accountEditDialog *aed;
 
 private slots:
+    void fillAccounts();
     void newButtonClicked();
     void editButtonClicked();
 

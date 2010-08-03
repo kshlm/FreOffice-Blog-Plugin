@@ -32,6 +32,9 @@ public:
     void setTags(QString &);
     QString *getTags();
     QVariantMap preparePost();
+
+signals:
+    void error();
 };
 
 #endif // WORDPRESSPOST_H

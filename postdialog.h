@@ -11,6 +11,7 @@ class QMaemo5ValueButton;
 class QMaemo5ListPickSelector;
 class QPushButton;
 class QLineEdit;
+class QCheckBox;
 
 class postDialog : public QDialog {
     Q_OBJECT
@@ -32,11 +33,12 @@ private:
     QLineEdit *categoryEdit;
     QPushButton *selectButton;
     QPushButton *postButton;
-
+    QCheckBox *publishCheckbox;
 private slots:
     void showOpenFileDialog();
     void postButtonClicked();
     void newPostSignalSlot(int);
+    void errorSlot();
 
 };
 

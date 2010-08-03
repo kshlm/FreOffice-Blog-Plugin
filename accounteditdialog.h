@@ -31,6 +31,7 @@ private:
 private slots:
     void saveButtonClicked();
     void saveAccount(int blogId);
+    void errorSlot();
 };
 
 #endif // ACCOUNTEDITDIALOG_H

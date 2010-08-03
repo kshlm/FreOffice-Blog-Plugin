@@ -66,4 +66,5 @@ void wordpressApi::newPostSlot(QVariant & reply)
 void wordpressApi::xmlrpcFaultSlot(int error, QString message)
 {
     qDebug() << "Error : " << error << message;
+    emit wordpressError();
 }

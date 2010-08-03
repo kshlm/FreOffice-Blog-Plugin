@@ -34,6 +34,7 @@ private slots:
 signals:
     void newPostSignal(int);
     void getBlogidSignal(int);
+    void wordpressError();
 };
 
 #endif // WORDPRESSAPI_H

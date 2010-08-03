@@ -97,12 +97,15 @@ void accountEditDialog::saveButtonClicked()
     api->setPassword(password);
     api->getBlogid();
     connect(api, SIGNAL(getBlogidSignal(int)), this, SLOT(saveAccount(int)));
+    connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
     disableWidgets();
 }
 
 void accountEditDialog::saveAccount(int blogId)
 {
     if(0 == blogId) {
+        this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
         QMaemo5InformationBox::information(this, "Failed to fetch blogid.\nCheck the details again.", QMaemo5InformationBox::NoTimeout);
         enableWidgets();
         return;
@@ -118,7 +121,15 @@ void accountEditDialog::saveAccount(int blogId)
     settings.setValue(QString(blogUrlEdit->text()).remove("http://"), map);
     settings.endGroup();
     settings.sync();
-    enableWidgets();
+    QMaemo5InformationBox::information(this, QString("Saved account %1 sucessfully").arg(blogUrlEdit->text().remove("http://")), QMaemo5InformationBox::DefaultTimeout);
+    this->accept();
+}
+
+void accountEditDialog::errorSlot()
+{
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
+    QMaemo5InformationBox::information(this, "An error occured while fetching the blogid.\n Please check the details you have entered.\nIf the error persists, check your internet connection and retry later.", QMaemo5InformationBox::NoTimeout);
+    this->enableWidgets();
 }
 
 void accountEditDialog::disableWidgets()

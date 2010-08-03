@@ -19,6 +19,10 @@ settingsDialog::settingsDialog(QWidget *parent) :
     fillAccounts();
     connect(newButton, SIGNAL(clicked()), this, SLOT(newButtonClicked()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editButtonClicked()));
+    aed = 0;
+    if("" == accountButton->valueText()) {
+        newButtonClicked();
+    }
 }
 
 settingsDialog::~settingsDialog()
@@ -59,14 +63,24 @@ void settingsDialog::fillAccounts()
 
 void settingsDialog::newButtonClicked()
 {
-    accountEditDialog *aed = new accountEditDialog(this);
+    if(aed != 0 ) {
+        delete aed;
+        aed = 0;
+    }
+    aed = new accountEditDialog(this);
     aed->show();
+    connect(aed, SIGNAL(accepted()), this, SLOT(fillAccounts()));
 }
 
 void settingsDialog::editButtonClicked()
 {
+    if(aed != 0 ) {
+        delete aed;
+        aed = 0;
+    }
     qDebug() << accountButton->valueText();
     QString blog = accountButton->valueText();
-    accountEditDialog *aed = new accountEditDialog(blog,this);
+    aed = new accountEditDialog(blog,this);
     aed->show();
+    connect(aed, SIGNAL(accepted()), this, SLOT(fillAccounts()));
 }
