@@ -13,7 +13,7 @@ QT += xml \
     maemo5
 LIBS += -lkomain \
     -lkwordprivate
-
+#CONFIG += debug
 # Input
 HEADERS += libmaia/maiaFault.h \
     libmaia/maiaObject.h \
@@ -26,7 +26,9 @@ HEADERS += libmaia/maiaFault.h \
     settingsdialog.h \
     documentextractor.h \
     accounteditdialog.h \
-    postdialog.h
+    postdialog.h \
+    bloggerpost.h \
+    bloggerapi.h
 SOURCES += libmaia/maiaFault.cpp \
     libmaia/maiaObject.cpp \
     libmaia/maiaXmlRpcClient.cpp \
@@ -39,5 +41,7 @@ SOURCES += libmaia/maiaFault.cpp \
     settingsdialog.cpp \
     documentextractor.cpp \
     accounteditdialog.cpp \
-    postdialog.cpp
+    postdialog.cpp \
+    bloggerpost.cpp \
+    bloggerapi.cpp
 FORMS += maindialog.ui

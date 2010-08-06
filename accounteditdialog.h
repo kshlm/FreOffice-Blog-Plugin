@@ -2,11 +2,13 @@
 #define ACCOUNTEDITDIALOG_H
 
 #include <QDialog>
-
+#include <QMap>
 class QMaemo5ValueButton;
 class QMaemo5ListPickSelector;
 class QPushButton;
 class QLineEdit;
+class QComboBox;
+class QLabel;
 
 class accountEditDialog : public QDialog {
     Q_OBJECT
@@ -18,11 +20,15 @@ public:
 private:
     QMaemo5ValueButton *blogPlatform;
     QMaemo5ListPickSelector *selector;
+    QComboBox *bloggerBlogs;
     QPushButton *saveButton;
     QLineEdit *blogUrlEdit;
     QLineEdit *usernameEdit;
     QLineEdit *passwordEdit;
-
+    QLabel *l1;
+    QLabel *l2;
+    QLabel *l3;
+    QLabel *l4;
     void setupDialog();
     void fillDetails(QString &);
     void disableWidgets();
@@ -30,7 +36,8 @@ private:
 
 private slots:
     void saveButtonClicked();
-    void saveAccount(int blogId);
+    void saveAccount(int blogId = 0);
+    void bloggerApiListDoneSlot(QMap<QString, QString>);
     void errorSlot();
 };
 

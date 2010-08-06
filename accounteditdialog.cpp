@@ -1,5 +1,6 @@
 #include "accounteditdialog.h"
 #include "wordpressapi.h"
+#include "bloggerapi.h"
 #include <QMaemo5ValueButton>
 #include <QMaemo5ListPickSelector>
 #include <QMaemo5InformationBox>
@@ -10,11 +11,11 @@
 #include <QVBoxLayout>
 #include <QStandardItemModel>
 #include <QStandardItem>
-
+#include <QListWidget>
 #include <QDebug>
 #include <QSettings>
 #include <QVariantMap>
-
+#include <QComboBox>
 accountEditDialog::accountEditDialog(QWidget *parent) :
     QDialog(parent)
 {
@@ -39,23 +40,27 @@ void accountEditDialog::setupDialog()
 {
     blogPlatform = new QMaemo5ValueButton("Select platform");
     blogPlatform->setValueLayout(QMaemo5ValueButton::ValueBesideText);
-    QLabel *l1 = new QLabel("Blog Url", this);
-    QLabel *l2 = new QLabel("Username", this);
-    QLabel *l3 = new QLabel("Password", this);
+    l1 = new QLabel("Blog Url", this);
+    l2 = new QLabel("Username", this);
+    l3 = new QLabel("Password", this);
+    l4 = new QLabel("Select blog");
     blogUrlEdit = new QLineEdit(this);
     usernameEdit = new QLineEdit(this);
     passwordEdit = new QLineEdit(this);
+    bloggerBlogs = new QComboBox(this);
     passwordEdit->setEchoMode(QLineEdit::Password);
     QFormLayout *flayout = new QFormLayout();
     flayout->addRow(l1, blogUrlEdit);
     flayout->addRow(l2, usernameEdit);
     flayout->addRow(l3, passwordEdit);
+    flayout->addRow(l4, bloggerBlogs);
     saveButton = new QPushButton("Save", this);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(blogPlatform);
     layout->addLayout(flayout);
     layout->addWidget(saveButton);
-
+    bloggerBlogs->setVisible(false);
+    l4->setVisible(false);
     QStringList list;
     list << "Wordpress" << "Blogger";
     QStandardItemModel *model = new QStandardItemModel(this);
@@ -92,14 +97,40 @@ void accountEditDialog::saveButtonClicked()
     QString blogUrl = blogUrlEdit->text();
     QString username = usernameEdit->text();
     QString password = passwordEdit->text();
-    wordpressApi *api = new wordpressApi(blogUrl, this);
-    api->setUsername(username);
-    api->setPassword(password);
-    api->getBlogid();
-    connect(api, SIGNAL(getBlogidSignal(int)), this, SLOT(saveAccount(int)));
-    connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
+    if("Wordpress" == selector->currentValueText()) {
+        wordpressApi *api = new wordpressApi(blogUrl, this);
+        api->setUsername(username);
+        api->setPassword(password);
+        api->getBlogid();
+        connect(api, SIGNAL(getBlogidSignal(int)), this, SLOT(saveAccount(int)));
+        connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
+    }
+    else if ("Blogger" == selector->currentValueText()) {
+        bloggerApi *api = new bloggerApi(this);
+        api->setUsername(username);
+        api->setPassword(password);
+        api->authenticate(bloggerApi::ListBlogs);
+        connect(api,SIGNAL(listDone(QMap<QString,QString>)), this, SLOT(bloggerApiListDoneSlot(QMap<QString,QString>)));
+        connect(api, SIGNAL(bloggerError()), this, SLOT(errorSlot()));
+    }
     this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
     disableWidgets();
+}
+
+void accountEditDialog::bloggerApiListDoneSlot(QMap<QString, QString> blogs)
+{
+    qDebug() << "In bloggerListdone slot";
+    QListWidget *widget = new QListWidget(this);
+    QStringList keys = blogs.keys();
+    foreach(QString key, keys) {
+        qDebug() << key;
+        widget->addItem(key);
+    }
+    widget->setWindowFlags(Qt::Dialog);
+    widget->setWindowTitle("Select a blog");
+    widget->setEnabled(true);
+    widget->show();
+    qDebug() << "In bloggerListdone slot";
 }
 
 void accountEditDialog::saveAccount(int blogId)
@@ -128,7 +159,7 @@ void accountEditDialog::saveAccount(int blogId)
 void accountEditDialog::errorSlot()
 {
     this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
-    QMaemo5InformationBox::information(this, "An error occured while fetching the blogid.\n Please check the details you have entered.\nIf the error persists, check your internet connection and retry later.", QMaemo5InformationBox::NoTimeout);
+    QMaemo5InformationBox::information(this, "An error occured while verifying blog details.\n Please check the details you have entered.\nIf the error persists, check your internet connection and retry later.", QMaemo5InformationBox::NoTimeout);
     this->enableWidgets();
 }
 
