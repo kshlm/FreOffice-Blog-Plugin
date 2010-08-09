@@ -18,7 +18,7 @@ class postDialog : public QDialog {
 public:
     postDialog(QWidget *parent = 0);
     ~postDialog();
-
+    void setFilePath(const QString &);
 private:
     void setupDialog();
     void fillAccounts();

@@ -29,7 +29,7 @@ QString documentExtractor::getBody(QString &filePath)
     koview->unsetCursor();
     KWView *kwview = qobject_cast<KWView *>(koview);
     kwview->unsetCursor();
-    KoTextEditor *editor = qobject_cast<KoTextEditor *>(kwview->kwcanvas()->toolProxy()->selection());
+    KoTextEditor *editor = qobject_cast<KoTextEditor *>(kwview->canvasBase()->toolProxy()->selection());
     QTextDocument *tdoc = editor->document();
     QString data = tdoc->toHtml();
 

@@ -12,12 +12,14 @@ class mainDialog : public QDialog {
 public:
     mainDialog(QWidget *parent = 0);
     ~mainDialog();
+    void setFilePath(const QString &);
 
 protected:
     void changeEvent(QEvent *e);
 
 private:
     Ui::mainDialog *ui;
+    QString filePath;
 
 private slots:
     void showSettingsDialog();

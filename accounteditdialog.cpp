@@ -54,12 +54,17 @@ void accountEditDialog::setupDialog()
     flayout->addRow(l2, usernameEdit);
     flayout->addRow(l3, passwordEdit);
     flayout->addRow(l4, bloggerBlogs);
+    fetchBlogsButton = new QPushButton("Fetch Blogs", this);
     saveButton = new QPushButton("Save", this);
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    hlayout->addWidget(fetchBlogsButton);
+    hlayout->addWidget(saveButton);
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(blogPlatform);
     layout->addLayout(flayout);
-    layout->addWidget(saveButton);
+    layout->addLayout(hlayout);
     bloggerBlogs->setVisible(false);
+    fetchBlogsButton->setVisible(false);
     l4->setVisible(false);
     QStringList list;
     list << "Wordpress" << "Blogger";
@@ -76,6 +81,30 @@ void accountEditDialog::setupDialog()
     blogUrlEdit->setInputMethodHints(Qt::ImhNoAutoUppercase);
     usernameEdit->setInputMethodHints(Qt::ImhNoAutoUppercase);
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
+    connect(fetchBlogsButton, SIGNAL(clicked()), this, SLOT(fetchBlogsButtonClickedSlot()));
+    connect(selector,SIGNAL(selected(const QString &)), this, SLOT(platformSelected(QString)));
+}
+
+void accountEditDialog::platformSelected(const QString & platform)
+{
+    if("Wordpress" == platform) {
+        blogUrlEdit->setVisible(true);
+        l1->setVisible(true);
+        bloggerBlogs->setVisible(false);
+        l4->setVisible(false);
+        fetchBlogsButton->setVisible(false);
+        selector->setCurrentIndex(0);
+    }
+    if("Blogger" == platform) {
+        bloggerBlogs->setVisible(true);
+        bloggerBlogs->setDisabled(true);
+        l4->setVisible(true);
+        blogUrlEdit->setVisible(false);
+        l1->setVisible(false);
+        saveButton->setDisabled(true);
+        fetchBlogsButton->setVisible(true);
+        selector->setCurrentIndex(1);
+    }
 }
 
 void accountEditDialog::fillDetails(QString & blog)
@@ -83,6 +112,7 @@ void accountEditDialog::fillDetails(QString & blog)
     QSettings settings("freoffice", "blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map = settings.value(blog).value<QVariantMap>();
+    platformSelected(map.value("platform").toString());
     blogUrlEdit->setText(map.value("blogurl").toString());
     usernameEdit->setText(map.value("username").toString());
     passwordEdit->setText(map.value("password").toString());
@@ -90,7 +120,11 @@ void accountEditDialog::fillDetails(QString & blog)
 
 void accountEditDialog::saveButtonClicked()
 {
-    if("" == blogUrlEdit->text() | "" == usernameEdit->text() | "" == passwordEdit->text()) {
+    if("Blogger" == selector->currentValueText()) {
+//        blogUrlEdit->setText(bloggerBlogList.value(QString(bloggerBlogs->currentText())));
+        saveAccount(-1);
+    }
+    else if("" == blogUrlEdit->text() | "" == usernameEdit->text() | "" == passwordEdit->text()) {
         QMaemo5InformationBox::information(this, "Please enter all details", QMaemo5InformationBox::DefaultTimeout);
         return;
     }
@@ -105,14 +139,24 @@ void accountEditDialog::saveButtonClicked()
         connect(api, SIGNAL(getBlogidSignal(int)), this, SLOT(saveAccount(int)));
         connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
     }
-    else if ("Blogger" == selector->currentValueText()) {
-        bloggerApi *api = new bloggerApi(this);
-        api->setUsername(username);
-        api->setPassword(password);
-        api->authenticate(bloggerApi::ListBlogs);
-        connect(api,SIGNAL(listDone(QMap<QString,QString>)), this, SLOT(bloggerApiListDoneSlot(QMap<QString,QString>)));
-        connect(api, SIGNAL(bloggerError()), this, SLOT(errorSlot()));
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
+    disableWidgets();
+}
+
+void accountEditDialog::fetchBlogsButtonClickedSlot()
+{
+    if("" == usernameEdit->text() | "" == passwordEdit->text()) {
+        QMaemo5InformationBox::information(this, "Please enter all details", QMaemo5InformationBox::DefaultTimeout);
+        return;
     }
+    QString username = usernameEdit->text();
+    QString password = passwordEdit->text();
+    bloggerApi *api = new bloggerApi(this);
+    api->setUsername(username);
+    api->setPassword(password);
+    api->authenticate(bloggerApi::ListBlogs);
+    connect(api, SIGNAL(listDone(QMap<QString,QString>)), this, SLOT(bloggerApiListDoneSlot(QMap<QString,QString>)));
+    connect(api, SIGNAL(bloggerError()), this, SLOT(errorSlot()));
     this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
     disableWidgets();
 }
@@ -120,39 +164,50 @@ void accountEditDialog::saveButtonClicked()
 void accountEditDialog::bloggerApiListDoneSlot(QMap<QString, QString> blogs)
 {
     qDebug() << "In bloggerListdone slot";
-    QListWidget *widget = new QListWidget(this);
+    bloggerBlogList = blogs;
     QStringList keys = blogs.keys();
     foreach(QString key, keys) {
         qDebug() << key;
-        widget->addItem(key);
+        bloggerBlogs->addItem(key);
     }
-    widget->setWindowFlags(Qt::Dialog);
-    widget->setWindowTitle("Select a blog");
-    widget->setEnabled(true);
-    widget->show();
+    bloggerBlogs->setEnabled(true);
+    saveButton->setEnabled(true);
+    l4->setEnabled(true);
+    this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);
     qDebug() << "In bloggerListdone slot";
 }
 
 void accountEditDialog::saveAccount(int blogId)
 {
+    if("Blogger" == selector->currentValueText()) {
+        blogUrlEdit->setText(bloggerBlogList.value(QString(bloggerBlogs->currentText())));
+    }
     if(0 == blogId) {
         this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, true);
         QMaemo5InformationBox::information(this, "Failed to fetch blogid.\nCheck the details again.", QMaemo5InformationBox::NoTimeout);
         enableWidgets();
         return;
     }
+    QString name;
     QSettings settings("freoffice","blog-plugin", this);
     settings.beginGroup("Accounts");
     QVariantMap map;
     map.insert("platform", selector->currentValueText());
     map.insert("blogurl", QString(blogUrlEdit->text()));
-    map.insert("blogid", blogId);
+    if("Blogger" != selector->currentValueText())
+        map.insert("blogid", blogId);
     map.insert("username", QString(usernameEdit->text()));
     map.insert("password", QString(passwordEdit->text()));
-    settings.setValue(QString(blogUrlEdit->text()).remove("http://"), map);
+    if("Blogger" == selector->currentValueText()) {
+        name = bloggerBlogs->currentText().replace(" ", "_");
+    }
+    else {
+        name = blogUrlEdit->text().remove("http://");
+    }
+    settings.setValue(name, map);
     settings.endGroup();
     settings.sync();
-    QMaemo5InformationBox::information(this, QString("Saved account %1 sucessfully").arg(blogUrlEdit->text().remove("http://")), QMaemo5InformationBox::DefaultTimeout);
+    QMaemo5InformationBox::information(this, QString("Saved account %1 sucessfully").arg(name.replace("_"," ")), QMaemo5InformationBox::DefaultTimeout);
     this->accept();
 }
 
@@ -165,10 +220,31 @@ void accountEditDialog::errorSlot()
 
 void accountEditDialog::disableWidgets()
 {
-    this->setDisabled(true);
+    blogPlatform->setDisabled(true);
+    bloggerBlogs->setDisabled(true);
+    saveButton->setDisabled(true);
+    fetchBlogsButton->setDisabled(true);
+    blogUrlEdit->setDisabled(true);
+    usernameEdit->setDisabled(true);
+    passwordEdit->setDisabled(true);
+    l1->setDisabled(true);
+    l2->setDisabled(true);
+    l3->setDisabled(true);
+    l4->setDisabled(true);
 }
 
 void accountEditDialog::enableWidgets()
 {
-    this->setEnabled(true);
+    blogPlatform->setDisabled(false);
+    bloggerBlogs->setDisabled(false);
+    if("Blogger" != selector->currentValueText())
+        saveButton->setDisabled(false);
+    fetchBlogsButton->setDisabled(false);
+    blogUrlEdit->setDisabled(false);
+    usernameEdit->setDisabled(false);
+    passwordEdit->setDisabled(false);
+    l1->setDisabled(false);
+    l2->setDisabled(false);
+    l3->setDisabled(false);
+    l4->setDisabled(false);
 }

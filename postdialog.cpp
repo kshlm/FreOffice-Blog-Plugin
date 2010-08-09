@@ -1,6 +1,8 @@
 #include "postdialog.h"
 #include "wordpressapi.h"
 #include "wordpresspost.h"
+#include "bloggerapi.h"
+#include "bloggerpost.h"
 #include "documentextractor.h"
 
 #include <QMaemo5ValueButton>
@@ -37,6 +39,11 @@ postDialog::postDialog(QWidget *parent) :
 
 postDialog::~postDialog()
 {
+}
+
+void postDialog::setFilePath(const QString & filePath)
+{
+    fileSelectEdit->setText(filePath);
 }
 
 void postDialog::setupDialog()
@@ -90,7 +97,8 @@ void postDialog::fillAccounts()
 
 void postDialog::showOpenFileDialog()
 {
-    QString filename = QFileDialog::getOpenFileName(this,"Select file", QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation), "Text Documents(*.odt *.doc)");
+    QString presentPath = ("" != fileSelectEdit->text())? fileSelectEdit->text():QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    QString filename = QFileDialog::getOpenFileName(this,"Select file", presentPath, "Text Documents(*.odt *.doc)");
     if("" == filename)
         return;
     fileSelectEdit->setText(filename);
@@ -113,34 +121,53 @@ void postDialog::postButtonClicked()
     QSettings settings("freoffice", "blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map = settings.value(blog).value<QVariantMap>();
+    QString platform = map.value("platform").toString();
     QString blogUrl = map.value("blogurl").toString();
     int blogId = map.value("blogid").toInt();
-    QString usename = map.value("username").toString();
+    QString username = map.value("username").toString();
     QString password = map.value("password").toString();
-
-    wordpressApi *api = new wordpressApi(blogUrl, this);
-    api->setBlogid(blogId);
-    api->setUsername(usename);
-    api->setPassword(password);
-
-    wordpressPost post;
     QString title = titleEdit->text();
     QString category = categoryEdit->text();
     QString tags = tagsEdit->text();
     QString filename = fileSelectEdit->text();
     QString postStatus = publishCheckbox->isChecked()? "publish" : "draft";
-    post.setTitle(title);
-    post.setTags(tags);
-    post.addCategory(category);
-    post.setPostStatus(postStatus);
-
     documentExtractor ext;
     QString description = ext.getBody(filename);
-    post.setDescription(description);
-    this->setWindowTitle("Posting ...");
-    api->newPost(post);
-    connect(api, SIGNAL(newPostSignal(int)), this, SLOT(newPostSignalSlot(int)));
-    connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
+
+    if("Wordpress" == platform) {
+        wordpressApi *api = new wordpressApi(blogUrl, this);
+        api->setBlogid(blogId);
+        api->setUsername(username);
+        api->setPassword(password);
+
+        wordpressPost post;
+        post.setTitle(title);
+        post.setTags(tags);
+        post.addCategory(category);
+        post.setPostStatus(postStatus);
+        post.setDescription(description);
+        this->setWindowTitle("Posting ...");
+        api->newPost(post);
+        connect(api, SIGNAL(newPostSignal(int)), this, SLOT(newPostSignalSlot(int)));
+        connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
+    }
+    if("Blogger" == platform) {
+        bloggerApi *api = new bloggerApi(this);
+        api->setUsername(username);
+        api->setPassword(password);
+        api->setBlogUrl(blogUrl);
+
+        bloggerPost post;
+        post.setTitle(title);
+        foreach(QString tag, tags.split(",", QString::SkipEmptyParts))
+            post.addTags(tag);
+        post.setContent(description);
+        api->setPost(post);
+        this->setWindowTitle("Posting...");
+        api->authenticate(bloggerApi::NewPost);
+        connect(api, SIGNAL(postDone(int)), this, SLOT(newPostSignalSlot(int)));
+        connect(api, SIGNAL(bloggerError()), this, SLOT(errorSlot()));
+    }
 }
 
 void postDialog::newPostSignalSlot(int postid)

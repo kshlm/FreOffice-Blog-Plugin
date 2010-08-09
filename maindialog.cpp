@@ -31,6 +31,11 @@ void mainDialog::changeEvent(QEvent *e)
     }
 }
 
+void mainDialog::setFilePath(const QString &filePath)
+{
+    this->filePath = filePath;
+}
+
 void mainDialog::showSettingsDialog()
 {
     settingsDialog *sd = new settingsDialog(this);
@@ -40,5 +45,6 @@ void mainDialog::showSettingsDialog()
 void mainDialog::showPostDialog()
 {
     postDialog *pd = new postDialog(this);
+    pd->setFilePath(filePath);
 //    pd->show();
 }

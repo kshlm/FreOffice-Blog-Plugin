@@ -22,6 +22,7 @@ private:
     QMaemo5ListPickSelector *selector;
     QComboBox *bloggerBlogs;
     QPushButton *saveButton;
+    QPushButton *fetchBlogsButton;
     QLineEdit *blogUrlEdit;
     QLineEdit *usernameEdit;
     QLineEdit *passwordEdit;
@@ -29,12 +30,17 @@ private:
     QLabel *l2;
     QLabel *l3;
     QLabel *l4;
+
+    QMap<QString, QString> bloggerBlogList;
+
     void setupDialog();
     void fillDetails(QString &);
     void disableWidgets();
     void enableWidgets();
 
 private slots:
+    void platformSelected(const QString &);
+    void fetchBlogsButtonClickedSlot();
     void saveButtonClicked();
     void saveAccount(int blogId = 0);
     void bloggerApiListDoneSlot(QMap<QString, QString>);

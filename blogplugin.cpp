@@ -1,6 +1,7 @@
 #include "blogplugin.h"
 #include "maindialog.h"
-
+#include "KoDocument.h"
+#include <QWeakPointer>
 onlineServicesPlugin::onlineServicesPlugin()
 {
     name = "Blog";
@@ -14,12 +15,16 @@ onlineServicesPlugin::~onlineServicesPlugin()
 
 void onlineServicesPlugin::setDocument(void *doc)
 {
-    Q_UNUSED(doc);
+//    QWeakPointer<void> p = doc;
+    this->doc = (KoDocument *) doc;
 }
 
 QWidget *onlineServicesPlugin::view()
 {
     window = new mainDialog();
+    if(doc) {
+        window->setFilePath(doc->url().path());
+    }
     return window;
 }
 

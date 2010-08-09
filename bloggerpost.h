@@ -15,7 +15,7 @@ public:
     bloggerPost();
     void setTitle(const QString &);
     void setContent(const QString &);
-    void addCategory(const QString &);
+    void addTags(const QString &);
     QString preparePost();
 };
 

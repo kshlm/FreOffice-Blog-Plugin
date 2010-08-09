@@ -12,37 +12,38 @@ class bloggerApi : public QObject
 {
     Q_OBJECT
 public:
-    enum BloggerFunction{Nothing = 0, ListBlogs};
+    enum BloggerFunction{Nothing = 0, ListBlogs, NewPost};
     bloggerApi(QObject *parent = 0);
 
     void setBlogUrl(const QString &);
     void setUsername(const QString &);
     void setPassword(const QString &);
     void setAuthToken(const QString &);
-    void authenticate(BloggerFunction);
+    void authenticate(BloggerFunction func = Nothing);
     void listBlogs();
-//    QStringList retrieveBlogList();
-    void post(bloggerPost &);
+    void setPost(bloggerPost &);
+    void newPost();
 
 private:
+    bool loggingIn;
+    bool waitingForList;
+    bool postingAPost;
     QString blogUrl;
     QString username;
     QString password;
     QString authToken;
     QNetworkAccessManager *manager;
-    QPointer<QNetworkReply> reply;
+
     BloggerFunction func;
+    bloggerPost *post;
 
 private slots:
-    void authenticateSlot();
-    void listSlot();
-    void postDoneSlot();
-    void errorSlot(QNetworkReply::NetworkError);
+    void handleData(QNetworkReply *);
 
 signals:
     void listDone(QMap<QString, QString>);
     void authenticationDone(QString);
-    void postDone(QString);
+    void postDone(int);
     void bloggerError();
 };
 
