@@ -1,5 +1,5 @@
-#ifndef ONLINESERVICESPLUGIN_H
-#define ONLINESERVICESPLUGIN_H
+#ifndef BLOGPLUGIN_H
+#define BLOGPLUGIN_H
 
 #include "OfficeInterface.h"
 #include <QObject>
@@ -7,13 +7,13 @@
 class mainDialog;
 class KoDocument;
 
-class onlineServicesPlugin: public QObject, public OfficeInterface
+class blogPlugin: public QObject, public OfficeInterface
 {
     Q_OBJECT
     Q_INTERFACES(OfficeInterface)
 public:
-    onlineServicesPlugin();
-    ~onlineServicesPlugin();
+    blogPlugin();
+    ~blogPlugin();
     void setDocument(void *doc);
     QWidget * view();
     QString pluginName();
@@ -25,4 +25,4 @@ private:
     KoDocument *doc;
 };
 
-#endif // ONLINESERVICESPLUGIN_H
+#endif // BLOGPLUGIN_H

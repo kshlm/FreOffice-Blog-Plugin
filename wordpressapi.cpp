@@ -30,7 +30,7 @@ void wordpressApi::getBlogid()
     qDebug() << "----> wordpressApi::getBlogid()";
     QVariantList params;
     params << username << password;
-    client->call("wp.getUsersBlogs", params, this, SLOT(getBlogidSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int,QString)));
+    client->call("wp.getUsersBlogs", params, this, SLOT(getBlogidSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int, QString)));
 }
 
 void wordpressApi::getBlogidSlot(QVariant & reply)
@@ -53,7 +53,7 @@ void wordpressApi::newPost(wordpressPost & post)
     qDebug() << "----> worpressApi::newPost()" ;
     QVariantList params;
     params << blogid << username << password << post.preparePost();
-    client->call("metaWeblog.newPost", params, this, SLOT(newPostSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int,QString)));
+    client->call("metaWeblog.newPost", params, this, SLOT(newPostSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int, QString)));
 }
 
 void wordpressApi::newPostSlot(QVariant & reply)

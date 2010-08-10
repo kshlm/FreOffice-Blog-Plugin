@@ -10,7 +10,8 @@ class QLineEdit;
 class QComboBox;
 class QLabel;
 
-class accountEditDialog : public QDialog {
+class accountEditDialog : public QDialog
+{
     Q_OBJECT
 public:
     accountEditDialog(QWidget *parent = 0);

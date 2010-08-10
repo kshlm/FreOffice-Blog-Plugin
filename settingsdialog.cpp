@@ -63,7 +63,7 @@ void settingsDialog::fillAccounts()
 
 void settingsDialog::newButtonClicked()
 {
-    if(aed != 0 ) {
+    if(aed != 0) {
         delete aed;
         aed = 0;
     }
@@ -74,13 +74,13 @@ void settingsDialog::newButtonClicked()
 
 void settingsDialog::editButtonClicked()
 {
-    if(aed != 0 ) {
+    if(aed != 0) {
         delete aed;
         aed = 0;
     }
     qDebug() << accountButton->valueText();
     QString blog = accountButton->valueText();
-    aed = new accountEditDialog(blog,this);
+    aed = new accountEditDialog(blog, this);
     aed->show();
     connect(aed, SIGNAL(accepted()), this, SLOT(fillAccounts()));
 }

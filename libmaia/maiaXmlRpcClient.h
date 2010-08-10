@@ -34,24 +34,25 @@
 
 #include "maiaObject.h"
 
-class MaiaXmlRpcClient : public QObject {
-	Q_OBJECT
-	
-	public:
-		MaiaXmlRpcClient(QObject* parent = 0);
-		MaiaXmlRpcClient(QUrl url, QObject* parent = 0);
-		void setUrl(QUrl url);
-		QNetworkReply* call(QString method, QList<QVariant> args,
-			 QObject* responseObject, const char* responseSlot,
-			 QObject* faultObject, const char* faultSlot);
-	
-	private slots:
-		void replyFinished(QNetworkReply*);
+class MaiaXmlRpcClient : public QObject
+{
+    Q_OBJECT
 
-	private:
-		QNetworkAccessManager manager;
-		QNetworkRequest request;
-		QMap<QNetworkReply*, MaiaObject*> callmap;
+public:
+    MaiaXmlRpcClient(QObject* parent = 0);
+    MaiaXmlRpcClient(QUrl url, QObject* parent = 0);
+    void setUrl(QUrl url);
+    QNetworkReply* call(QString method, QList<QVariant> args,
+                        QObject* responseObject, const char* responseSlot,
+                        QObject* faultObject, const char* faultSlot);
+
+private slots:
+    void replyFinished(QNetworkReply*);
+
+private:
+    QNetworkAccessManager manager;
+    QNetworkRequest request;
+    QMap<QNetworkReply*, MaiaObject*> callmap;
 };
 
 #endif

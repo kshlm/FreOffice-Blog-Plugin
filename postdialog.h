@@ -3,8 +3,9 @@
 
 #include <QDialog>
 #include <QMap>
-namespace Ui {
-    class postDialog;
+namespace Ui
+{
+class postDialog;
 }
 
 class QMaemo5ValueButton;
@@ -13,7 +14,8 @@ class QPushButton;
 class QLineEdit;
 class QCheckBox;
 
-class postDialog : public QDialog {
+class postDialog : public QDialog
+{
     Q_OBJECT
 public:
     postDialog(QWidget *parent = 0);

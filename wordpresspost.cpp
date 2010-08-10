@@ -77,11 +77,11 @@ QString * wordpressPost::getTags()
 QVariantMap wordpressPost::preparePost()
 {
     QVariantMap map;
-    map.insert("title",QString(title));
+    map.insert("title", QString(title));
     map.insert("description", QString(description));
     map.insert("post_status", QString(post_status));
     if(categories.length() > 0)
-        map.insert("categories" ,categories);
+        map.insert("categories" , categories);
     map.insert("mt_keywords", QString(mt_keywords));
     return map;
 }

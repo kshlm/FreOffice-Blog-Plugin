@@ -2,24 +2,24 @@
 #include "maindialog.h"
 #include "KoDocument.h"
 #include <QWeakPointer>
-onlineServicesPlugin::onlineServicesPlugin()
+blogPlugin::blogPlugin()
 {
     name = "Blog";
     window = 0;
 }
-onlineServicesPlugin::~onlineServicesPlugin()
+blogPlugin::~blogPlugin()
 {
     delete window;
     window = 0;
 }
 
-void onlineServicesPlugin::setDocument(void *doc)
+void blogPlugin::setDocument(void *doc)
 {
 //    QWeakPointer<void> p = doc;
     this->doc = (KoDocument *) doc;
 }
 
-QWidget *onlineServicesPlugin::view()
+QWidget *blogPlugin::view()
 {
     window = new mainDialog();
     if(doc) {
@@ -28,16 +28,16 @@ QWidget *onlineServicesPlugin::view()
     return window;
 }
 
-QString onlineServicesPlugin::pluginName()
+QString blogPlugin::pluginName()
 {
     return name;
 }
 
-QStringList onlineServicesPlugin::pluginSupportTypes()
+QStringList blogPlugin::pluginSupportTypes()
 {
     QStringList types;
-    types << "All";
+    types << "Document";
     return types;
 }
 
-Q_EXPORT_PLUGIN2(OnlineServicesPlugin, onlineServicesPlugin)
+Q_EXPORT_PLUGIN2(BlogPlugin, blogPlugin)

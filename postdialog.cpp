@@ -50,8 +50,8 @@ void postDialog::setupDialog()
 {
     accountButton = new QMaemo5ValueButton("Select a blog", this);
     accountButton->setValueLayout(QMaemo5ValueButton::ValueBesideText);
-    selectButton = new QPushButton("Select file",this);
-    postButton = new QPushButton("Post",this);
+    selectButton = new QPushButton("Select file", this);
+    postButton = new QPushButton("Post", this);
     fileSelectEdit = new QLineEdit(this);
     fileSelectEdit->setDisabled(true);
     titleEdit = new QLineEdit(this);
@@ -97,8 +97,8 @@ void postDialog::fillAccounts()
 
 void postDialog::showOpenFileDialog()
 {
-    QString presentPath = ("" != fileSelectEdit->text())? fileSelectEdit->text():QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-    QString filename = QFileDialog::getOpenFileName(this,"Select file", presentPath, "Text Documents(*.odt *.doc)");
+    QString presentPath = ("" != fileSelectEdit->text()) ? fileSelectEdit->text() : QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+    QString filename = QFileDialog::getOpenFileName(this, "Select file", presentPath, "Text Documents(*.odt *.doc)");
     if("" == filename)
         return;
     fileSelectEdit->setText(filename);
@@ -106,7 +106,7 @@ void postDialog::showOpenFileDialog()
 
 void postDialog::postButtonClicked()
 {
-    if("" == fileSelectEdit->text() | "" ==titleEdit->text()) {
+    if("" == fileSelectEdit->text() | "" == titleEdit->text()) {
         QMaemo5InformationBox::information(this, "At least select a file and give a title", QMaemo5InformationBox::DefaultTimeout);
         titleEdit->setFocus();
         return;
@@ -130,7 +130,7 @@ void postDialog::postButtonClicked()
     QString category = categoryEdit->text();
     QString tags = tagsEdit->text();
     QString filename = fileSelectEdit->text();
-    QString postStatus = publishCheckbox->isChecked()? "publish" : "draft";
+    QString postStatus = publishCheckbox->isChecked() ? "publish" : "draft";
     documentExtractor ext;
     QString description = ext.getBody(filename);
 
@@ -160,7 +160,7 @@ void postDialog::postButtonClicked()
         bloggerPost post;
         post.setTitle(title);
         foreach(QString tag, tags.split(",", QString::SkipEmptyParts))
-            post.addTags(tag);
+        post.addTags(tag);
         post.setContent(description);
         api->setPost(post);
         this->setWindowTitle("Posting...");

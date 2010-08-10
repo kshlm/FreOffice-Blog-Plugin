@@ -29,62 +29,65 @@
 #include "maiaFault.h"
 
 MaiaXmlRpcClient::MaiaXmlRpcClient(QObject* parent) : QObject(parent),
-	manager(this), request() 
+    manager(this), request()
 {
 
-	request.setRawHeader("User-Agent", "libmaia 0.2");
-	request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    request.setRawHeader("User-Agent", "libmaia 0.2");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
-	connect(&manager, SIGNAL(finished(QNetworkReply*)),
-		this, SLOT(replyFinished(QNetworkReply*)));
+    connect(&manager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
 }
 
 MaiaXmlRpcClient::MaiaXmlRpcClient(QUrl url, QObject* parent) : QObject(parent),
-	manager(this), request(url)
+    manager(this), request(url)
 {
-	request.setRawHeader("User-Agent", "libmaia 0.2");
-	request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
+    request.setRawHeader("User-Agent", "libmaia 0.2");
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "text/xml");
 
-	connect(&manager, SIGNAL(finished(QNetworkReply*)),
-		this, SLOT(replyFinished(QNetworkReply*)));
+    connect(&manager, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(replyFinished(QNetworkReply*)));
 
-	setUrl(url);
+    setUrl(url);
 }
 
-void MaiaXmlRpcClient::setUrl(QUrl url) {
-	if(!url.isValid())
-		return;
-	
-	request.setUrl(url);
+void MaiaXmlRpcClient::setUrl(QUrl url)
+{
+    if(!url.isValid())
+        return;
+
+    request.setUrl(url);
 }
 
 QNetworkReply* MaiaXmlRpcClient::call(QString method, QList<QVariant> args,
-							QObject* responseObject, const char* responseSlot,
-							QObject* faultObject, const char* faultSlot) {
-	MaiaObject* call = new MaiaObject(this);
-	connect(call, SIGNAL(aresponse(QVariant &, QNetworkReply *)), responseObject, responseSlot);
-	connect(call, SIGNAL(fault(int, const QString &, QNetworkReply *)), faultObject, faultSlot);
+                                      QObject* responseObject, const char* responseSlot,
+                                      QObject* faultObject, const char* faultSlot)
+{
+    MaiaObject* call = new MaiaObject(this);
+    connect(call, SIGNAL(aresponse(QVariant &, QNetworkReply *)), responseObject, responseSlot);
+    connect(call, SIGNAL(fault(int, const QString &, QNetworkReply *)), faultObject, faultSlot);
 
-	QNetworkReply* reply = manager.post( request,
-		call->prepareCall(method, args).toUtf8() );
+    QNetworkReply* reply = manager.post(request,
+                                        call->prepareCall(method, args).toUtf8());
 
-	callmap[reply] = call;
-	return reply;
+    callmap[reply] = call;
+    return reply;
 }
 
-void MaiaXmlRpcClient::replyFinished(QNetworkReply* reply) {
-	QString response;
-	if(!callmap.contains(reply))
-		return;
-	if(reply->error() != QNetworkReply::NoError) {
-		MaiaFault fault(-32300, reply->errorString());
-		response = fault.toString();
-	} else {
-		response = QString::fromUtf8(reply->readAll());
-	}
-	
-	// parseResponse deletes the MaiaObject
-	callmap[reply]->parseResponse(response, reply);
-	reply->deleteLater();
-	callmap.remove(reply);
+void MaiaXmlRpcClient::replyFinished(QNetworkReply* reply)
+{
+    QString response;
+    if(!callmap.contains(reply))
+        return;
+    if(reply->error() != QNetworkReply::NoError) {
+        MaiaFault fault(-32300, reply->errorString());
+        response = fault.toString();
+    } else {
+        response = QString::fromUtf8(reply->readAll());
+    }
+
+    // parseResponse deletes the MaiaObject
+    callmap[reply]->parseResponse(response, reply);
+    reply->deleteLater();
+    callmap.remove(reply);
 }

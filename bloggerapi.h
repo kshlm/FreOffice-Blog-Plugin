@@ -12,7 +12,7 @@ class bloggerApi : public QObject
 {
     Q_OBJECT
 public:
-    enum BloggerFunction{Nothing = 0, ListBlogs, NewPost};
+    enum BloggerFunction {Nothing = 0, ListBlogs, NewPost};
     bloggerApi(QObject *parent = 0);
 
     void setBlogUrl(const QString &);

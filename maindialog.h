@@ -3,11 +3,13 @@
 
 #include <QDialog>
 
-namespace Ui {
-    class mainDialog;
+namespace Ui
+{
+class mainDialog;
 }
 
-class mainDialog : public QDialog {
+class mainDialog : public QDialog
+{
     Q_OBJECT
 public:
     mainDialog(QWidget *parent = 0);

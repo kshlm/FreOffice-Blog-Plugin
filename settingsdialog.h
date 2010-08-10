@@ -9,11 +9,13 @@ class QPushButton;
 class QStandardItemModel;
 class QMaemo5ListPickSelector;
 class accountEditDialog;
-namespace Ui {
-    class settingsDialog;
+namespace Ui
+{
+class settingsDialog;
 }
 
-class settingsDialog : public QDialog {
+class settingsDialog : public QDialog
+{
     Q_OBJECT
 public:
     settingsDialog(QWidget *parent = 0);

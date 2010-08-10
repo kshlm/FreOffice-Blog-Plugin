@@ -43,7 +43,7 @@ void bloggerApi::authenticate(BloggerFunction f)
 {
     func = f;
     QByteArray data;
-    data.append(QString("Email="+username+"&Passwd="+password).toUtf8());
+    data.append(QString("Email=" + username + "&Passwd=" + password).toUtf8());
     data.append(QString("&service=blogger&source=FreOffice").toUtf8());
     QNetworkRequest req(QUrl("https://www.google.com/accounts/ClientLogin"));
     req.setRawHeader("Host", "www.google.com");
@@ -60,7 +60,7 @@ void bloggerApi::newPost()
     qDebug() << "NewPost 1";
     QByteArray postData = post->preparePost().toUtf8();
     qDebug() << postData;
-    QUrl url(blogUrl.replace("http://","https://"));
+    QUrl url(blogUrl.replace("http://", "https://"));
     QNetworkRequest request(url);
     request.setRawHeader("User-Agent", "FreOffice");
     request.setRawHeader("GData-Version", "2.0");
@@ -80,9 +80,9 @@ void bloggerApi::handleData(QNetworkReply *reply)
             loggingIn = false;
             qDebug() << "In authenticate" ;
             QString text(data.data());
-            text = text.right(text.length()-text.indexOf("Auth=")-5);
-            authToken = QString("GoogleLogin auth=")+text.left(text.indexOf("\n"));
-            if (authToken.length() > 20) {
+            text = text.right(text.length() - text.indexOf("Auth=") - 5);
+            authToken = QString("GoogleLogin auth=") + text.left(text.indexOf("\n"));
+            if(authToken.length() > 20) {
                 qDebug() << "sucess" << authToken;
                 emit authenticationDone(authToken);
                 delete reply;
@@ -93,12 +93,10 @@ void bloggerApi::handleData(QNetworkReply *reply)
                 if(func == this->NewPost) {
                     newPost();
                 }
-            }
-            else {
+            } else {
                 emit bloggerError();
             }
-        }
-        else if(waitingForList) {
+        } else if(waitingForList) {
             waitingForList = false;
             qDebug() << "In listslot" ;
             QMap<QString, QString> blogs;
@@ -117,16 +115,14 @@ void bloggerApi::handleData(QNetworkReply *reply)
             }
             emit listDone(blogs);
             reply->deleteLater();
-        }
-        else if(postingAPost) {
+        } else if(postingAPost) {
             postingAPost = false;
             qDebug() << "POST DONE REPLY DUMP" ;
             qDebug() << reply->readAll();
             emit postDone(0);
             reply->deleteLater();
         }
-    }
-    else {
+    } else {
         qDebug() << "ERROR" << endl << data;
         qDebug() << reply->errorString();
         emit bloggerError();
