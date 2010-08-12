@@ -4,6 +4,7 @@
 #include "bloggerapi.h"
 #include "bloggerpost.h"
 #include "documentextractor.h"
+#include "encryptsupport.h"
 
 #include <QMaemo5ValueButton>
 #include <QMaemo5ListPickSelector>
@@ -22,7 +23,8 @@
 #include <QMaemo5InformationBox>
 
 postDialog::postDialog(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    cipher(new encryptSupport(this))
 {
     setupDialog();
     fillAccounts();
@@ -126,6 +128,7 @@ void postDialog::postButtonClicked()
     int blogId = map.value("blogid").toInt();
     QString username = map.value("username").toString();
     QString password = map.value("password").toString();
+    password = cipher->decrypt(password);
     QString title = titleEdit->text();
     QString category = categoryEdit->text();
     QString tags = tagsEdit->text();

@@ -1,6 +1,8 @@
 #include "accounteditdialog.h"
 #include "wordpressapi.h"
 #include "bloggerapi.h"
+#include "encryptsupport.h"
+
 #include <QMaemo5ValueButton>
 #include <QMaemo5ListPickSelector>
 #include <QMaemo5InformationBox>
@@ -17,7 +19,8 @@
 #include <QVariantMap>
 #include <QComboBox>
 accountEditDialog::accountEditDialog(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    cipher(new encryptSupport(this))
 {
     setupDialog();
     this->setWindowTitle("New Account");
@@ -112,10 +115,15 @@ void accountEditDialog::fillDetails(QString & blog)
     QSettings settings("freoffice", "blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map = settings.value(blog).value<QVariantMap>();
-    platformSelected(map.value("platform").toString());
-    blogUrlEdit->setText(map.value("blogurl").toString());
-    usernameEdit->setText(map.value("username").toString());
-    passwordEdit->setText(map.value("password").toString());
+    QString platform = map.value("platform").toString();
+    QString blogUrl = map.value("platform").toString();
+    QString username = map.value("username").toString();
+    QString password = map.value("password").toString();
+
+    platformSelected(platform);
+    blogUrlEdit->setText(blogUrl);
+    usernameEdit->setText(username);
+    passwordEdit->setText(cipher->decrypt(password));
 }
 
 void accountEditDialog::saveButtonClicked()
@@ -188,15 +196,20 @@ void accountEditDialog::saveAccount(int blogId)
         return;
     }
     QString name;
+    QString platform = selector->currentValueText();
+    QString username = usernameEdit->text();
+    QString password = passwordEdit->text();
+    QString blogUrl = blogUrlEdit->text();
+
     QSettings settings("freoffice", "blog-plugin", this);
     settings.beginGroup("Accounts");
     QVariantMap map;
-    map.insert("platform", selector->currentValueText());
-    map.insert("blogurl", QString(blogUrlEdit->text()));
+    map.insert("platform", platform);
+    map.insert("blogurl", blogUrl);
     if("Blogger" != selector->currentValueText())
         map.insert("blogid", blogId);
-    map.insert("username", QString(usernameEdit->text()));
-    map.insert("password", QString(passwordEdit->text()));
+    map.insert("username", username);
+    map.insert("password", cipher->encrypt(password));
     if("Blogger" == selector->currentValueText()) {
         name = bloggerBlogs->currentText().replace(" ", "_");
     } else {

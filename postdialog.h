@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QMap>
+
+class encryptSupport;
+
 namespace Ui
 {
 class postDialog;
@@ -36,6 +39,8 @@ private:
     QPushButton *selectButton;
     QPushButton *postButton;
     QCheckBox *publishCheckbox;
+
+    encryptSupport *cipher;
 private slots:
     void showOpenFileDialog();
     void postButtonClicked();

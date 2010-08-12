@@ -9,6 +9,7 @@ class QPushButton;
 class QLineEdit;
 class QComboBox;
 class QLabel;
+class encryptSupport;
 
 class accountEditDialog : public QDialog
 {
@@ -19,6 +20,8 @@ public:
     ~accountEditDialog();
 
 private:
+    encryptSupport *cipher;
+
     QMaemo5ValueButton *blogPlatform;
     QMaemo5ListPickSelector *selector;
     QComboBox *bloggerBlogs;

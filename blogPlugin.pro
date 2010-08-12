@@ -13,7 +13,8 @@ QT += xml \
     network \
     maemo5
 LIBS += -lkomain \
-    -lkwordprivate
+    -lkwordprivate \
+    -lcrypto
 CONFIG += plugin
 TARGET = BlogPlugin
 target.path = /usr/lib/freoffice/
@@ -34,7 +35,10 @@ HEADERS += libmaia/maiaFault.h \
     postdialog.h \
     blogplugin.h \
     bloggerapi.h \
-    bloggerpost.h
+    bloggerpost.h \
+    encryptsupport.h \
+    postdialog.h
+
 SOURCES += libmaia/maiaFault.cpp \
     libmaia/maiaObject.cpp \
     libmaia/maiaXmlRpcClient.cpp \
@@ -49,5 +53,6 @@ SOURCES += libmaia/maiaFault.cpp \
     postdialog.cpp \
     blogplugin.cpp \
     bloggerapi.cpp \
-    bloggerpost.cpp
+    bloggerpost.cpp \
+    encryptsupport.cpp
 FORMS += maindialog.ui
