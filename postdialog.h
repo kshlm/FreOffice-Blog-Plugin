@@ -46,6 +46,7 @@ private slots:
     void postButtonClicked();
     void newPostSignalSlot(int);
     void errorSlot();
+    void selectorSelectedSlot(QString);
 
 };
 

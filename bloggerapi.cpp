@@ -55,6 +55,19 @@ void bloggerApi::authenticate(BloggerFunction f)
     loggingIn = true;
 }
 
+void bloggerApi::listBlogs()
+{
+    qDebug() << "In listblogs";
+    QUrl url("http://www.blogger.com/feeds/default/blogs");
+    QNetworkRequest request(url);
+    request.setRawHeader("User-Agent", "FreOffice");
+    request.setRawHeader("GData-Version", "2.0");
+    request.setRawHeader("Authorization", authToken.toUtf8());
+
+    manager->get(request);
+    waitingForList = true;
+}
+
 void bloggerApi::newPost()
 {
     qDebug() << "NewPost 1";

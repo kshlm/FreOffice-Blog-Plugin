@@ -22,6 +22,7 @@
 #include <QDesktopServices>
 #include <QMaemo5InformationBox>
 
+
 postDialog::postDialog(QWidget *parent) :
     QDialog(parent),
     cipher(new encryptSupport(this))
@@ -36,6 +37,7 @@ postDialog::postDialog(QWidget *parent) :
     this->setWindowTitle("New Post");
     connect(selectButton, SIGNAL(clicked()), this, SLOT(showOpenFileDialog()));
     connect(postButton, SIGNAL(clicked()), this, SLOT(postButtonClicked()));
+    connect(selector, SIGNAL(selected(QString)), this, SLOT(selectorSelectedSlot(QString)));
     this->show();
 }
 
@@ -93,8 +95,26 @@ void postDialog::fillAccounts()
     }
     selector = new QMaemo5ListPickSelector;
     selector->setModel(model);
-    selector->setCurrentIndex(0);
+    selector->setCurrentIndex(-1);
     accountButton->setPickSelector(selector);
+    selectorSelectedSlot(selector->currentValueText());
+}
+
+void postDialog::selectorSelectedSlot(QString value)
+{
+    QSettings settings("freoffice", "blog-plugin");
+    settings.beginGroup("Accounts");
+    QVariantMap m = settings.value(value).value<QVariantMap>();
+    QString platform = m.value("platform").toString();
+
+    if("Wordpress" == platform) {
+        categoryEdit->setEnabled(true);
+        publishCheckbox->setEnabled(true);
+    }
+    if("Blogger" == platform) {
+        categoryEdit->setDisabled(true);
+        publishCheckbox->setDisabled(true);
+    }
 }
 
 void postDialog::showOpenFileDialog()
@@ -204,8 +224,8 @@ void postDialog::enableDialog()
     accountButton->setEnabled(true);
     selectButton->setEnabled(true);
     titleEdit->setEnabled(true);
-    categoryEdit->setEnabled(true);
     tagsEdit->setEnabled(true);
     postButton->setEnabled(true);
+    categoryEdit->setEnabled(true);
     publishCheckbox->setEnabled(true);
 }
