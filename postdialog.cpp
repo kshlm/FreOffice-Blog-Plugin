@@ -109,11 +109,9 @@ void postDialog::selectorSelectedSlot(QString value)
 
     if("Wordpress" == platform) {
         categoryEdit->setEnabled(true);
-        publishCheckbox->setEnabled(true);
     }
     if("Blogger" == platform) {
         categoryEdit->setDisabled(true);
-        publishCheckbox->setDisabled(true);
     }
 }
 
@@ -171,7 +169,7 @@ void postDialog::postButtonClicked()
         post.setDescription(description);
         this->setWindowTitle("Posting ...");
         api->newPost(post);
-        connect(api, SIGNAL(newPostSignal(int)), this, SLOT(newPostSignalSlot(int)));
+        connect(api, SIGNAL(newPostSignal(qulonglong)), this, SLOT(newPostSignalSlot(qulonglong)));
         connect(api, SIGNAL(wordpressError()), this, SLOT(errorSlot()));
     }
     if("Blogger" == platform) {
@@ -185,15 +183,16 @@ void postDialog::postButtonClicked()
         foreach(QString tag, tags.split(",", QString::SkipEmptyParts))
         post.addTags(tag);
         post.setContent(description);
+        post.setPostStatus(postStatus);
         api->setPost(post);
         this->setWindowTitle("Posting...");
         api->authenticate(bloggerApi::NewPost);
-        connect(api, SIGNAL(postDone(int)), this, SLOT(newPostSignalSlot(int)));
+        connect(api, SIGNAL(postDone(qulonglong)), this, SLOT(newPostSignalSlot(qulonglong)));
         connect(api, SIGNAL(bloggerError()), this, SLOT(errorSlot()));
     }
 }
 
-void postDialog::newPostSignalSlot(int postid)
+void postDialog::newPostSignalSlot(qulonglong postid)
 {
     this->setWindowTitle("Done");
     this->setAttribute(Qt::WA_Maemo5ShowProgressIndicator, false);

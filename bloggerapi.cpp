@@ -91,15 +91,14 @@ void bloggerApi::handleData(QNetworkReply *reply)
     if(!reply->error()) {
         if(loggingIn) {
             loggingIn = false;
-            qDebug() << "In authenticate" ;
+            qDebug() << "--------> In authenticate" ;
             QString text(data.data());
             text = text.right(text.length() - text.indexOf("Auth=") - 5);
             authToken = QString("GoogleLogin auth=") + text.left(text.indexOf("\n"));
             if(authToken.length() > 20) {
-                qDebug() << "sucess" << authToken;
+                qDebug() << "Authentication sucessfull";
                 emit authenticationDone(authToken);
-                delete reply;
-                reply = 0;
+                reply->deleteLater();
                 if(func == this->ListBlogs) {
                     listBlogs();
                 }
@@ -111,7 +110,7 @@ void bloggerApi::handleData(QNetworkReply *reply)
             }
         } else if(waitingForList) {
             waitingForList = false;
-            qDebug() << "In listslot" ;
+            qDebug() << "--------> In listslot" ;
             QMap<QString, QString> blogs;
             QDomDocument doc;
             doc.setContent(data);
@@ -126,18 +125,26 @@ void bloggerApi::handleData(QNetworkReply *reply)
                 }
                 blogs.insert(title, blogUrl);
             }
+            qDebug() << "List done";
             emit listDone(blogs);
             reply->deleteLater();
         } else if(postingAPost) {
             postingAPost = false;
-            qDebug() << "POST DONE REPLY DUMP" ;
-            qDebug() << reply->readAll();
-            emit postDone(0);
+            qDebug() << "--------> In new post slot";
+            QDomDocument doc;
+            doc.setContent(data);
+            QDomNode entry = doc.documentElement();
+            QDomElement id = entry.firstChildElement("id");
+            QString postId = id.text();
+            postId = postId.right(postId.length() - postId.lastIndexOf("-") - 1);
+            qDebug() << "New post successful : " << postId.toULongLong();
+            emit postDone(postId.toULongLong());
             reply->deleteLater();
         }
     } else {
         qDebug() << "ERROR" << endl << data;
         qDebug() << reply->errorString();
         emit bloggerError();
+        reply->deleteLater();
     }
 }

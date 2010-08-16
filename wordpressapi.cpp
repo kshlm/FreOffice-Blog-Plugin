@@ -60,7 +60,7 @@ void wordpressApi::newPostSlot(QVariant & reply)
 {
     qDebug() << "----> wordpressApi::newPostSlot()";
     qDebug() << "New post successfull. ID = " << reply.toString();
-    emit newPostSignal(reply.toInt());
+    emit newPostSignal(reply.toULongLong());
 }
 
 void wordpressApi::xmlrpcFaultSlot(int error, QString message)

@@ -12,7 +12,8 @@ QT += xml \
     network \
     maemo5
 LIBS += -lkomain \
-    -lkwordprivate
+    -lkwordprivate \
+    -lcrypto
 #CONFIG += debug
 # Input
 HEADERS += libmaia/maiaFault.h \
@@ -28,7 +29,8 @@ HEADERS += libmaia/maiaFault.h \
     accounteditdialog.h \
     postdialog.h \
     bloggerpost.h \
-    bloggerapi.h
+    bloggerapi.h \
+    encryptsupport.h
 SOURCES += libmaia/maiaFault.cpp \
     libmaia/maiaObject.cpp \
     libmaia/maiaXmlRpcClient.cpp \
@@ -43,5 +45,6 @@ SOURCES += libmaia/maiaFault.cpp \
     accounteditdialog.cpp \
     postdialog.cpp \
     bloggerpost.cpp \
-    bloggerapi.cpp
+    bloggerapi.cpp \
+    encryptsupport.cpp
 FORMS += maindialog.ui

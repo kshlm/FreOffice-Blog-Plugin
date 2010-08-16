@@ -43,7 +43,7 @@ private slots:
 signals:
     void listDone(QMap<QString, QString>);
     void authenticationDone(QString);
-    void postDone(int);
+    void postDone(qulonglong);
     void bloggerError();
 };
 

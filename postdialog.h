@@ -44,7 +44,7 @@ private:
 private slots:
     void showOpenFileDialog();
     void postButtonClicked();
-    void newPostSignalSlot(int);
+    void newPostSignalSlot(qulonglong);
     void errorSlot();
     void selectorSelectedSlot(QString);
 

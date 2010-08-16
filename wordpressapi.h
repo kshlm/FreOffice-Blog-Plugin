@@ -32,7 +32,7 @@ private slots:
     void xmlrpcFaultSlot(int error, const QString message);
 
 signals:
-    void newPostSignal(int);
+    void newPostSignal(qulonglong);
     void getBlogidSignal(int);
     void wordpressError();
 };
