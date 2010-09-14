@@ -1,11 +1,15 @@
 #include "wordpressapi.h"
-#include "wordpresspost.h"
 #include "maiaXmlRpcClient.h"
 
 #include <QUrl>
+#include <QtXml>
+
+#include <KoStore.h>
+#include <kmimetype.h>
 
 wordpressApi::wordpressApi(QString &blogUrl, QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      count(0)
 {
     if(!blogUrl.endsWith("/", Qt::CaseInsensitive))
         blogUrl.append("/");
@@ -48,12 +52,24 @@ void wordpressApi::setBlogid(int blogid)
     this->blogid = blogid;
 }
 
+void wordpressApi::setKoStore(KoStore *store)
+{
+    this->store = store;
+}
+
 void wordpressApi::newPost(wordpressPost & post)
 {
     qDebug() << "----> worpressApi::newPost()" ;
-    QVariantList params;
-    params << blogid << username << password << post.preparePost();
-    client->call("metaWeblog.newPost", params, this, SLOT(newPostSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int, QString)));
+    this->post = post;
+    uploadImages();
+    connect(this, SIGNAL(imagesUploaded()),this, SLOT(continuePost()));
+}
+
+void wordpressApi::continuePost()
+{
+        QVariantList params;
+        params << blogid << username << password << post.preparePost();
+        client->call("metaWeblog.newPost", params, this, SLOT(newPostSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int, QString)));
 }
 
 void wordpressApi::newPostSlot(QVariant & reply)
@@ -67,4 +83,61 @@ void wordpressApi::xmlrpcFaultSlot(int error, QString message)
 {
     qDebug() << "Error : " << error << message;
     emit wordpressError();
+}
+
+void wordpressApi::uploadImages()
+{
+    qDebug() << "----> wordpressApi::uploadImages()";
+    doc.setContent(QString(*post.getDescription()));
+    QDomNodeList list  = doc.documentElement().elementsByTagName("img");
+    if(list.isEmpty()) {
+        emit imagesUploaded();
+        return;
+    }
+    for(uint i = 0; i < list.length(); i++) {
+        QDomNode node = list.at(i);
+        count++;
+        uploadImage(node.toElement().attribute("ns0:src"));
+        qDebug() << " IMAGE" << i << node.toElement().attribute("ns0:src");
+    }
+}
+
+void wordpressApi::uploadImage(QString pathInStore)
+{
+    qDebug() << "----> wordpressApi::uploadImage() :" << pathInStore;
+    QByteArray imgData;
+    store->extractFile(pathInStore, imgData);
+    QVariantMap map;
+    map.insert("name", QString(pathInStore));
+    map.insert("bits", QByteArray(imgData));
+    QString mimetype = "";
+    mimetype += KMimeType::findByContent(imgData)->name();
+    qDebug() << mimetype;
+    map.insert("type", QString(mimetype));
+    QVariantList params;
+    params << blogid << username << password << map;
+    client->call("wp.uploadFile", params, this, SLOT(uploadImageSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int,QString)));
+}
+
+void wordpressApi::uploadImageSlot(QVariant & reply) {
+    qDebug() << "----> wordPressApi::uploadImageSlot() : Image uploaded";
+    count--;
+    imgUrlList << reply.value<QVariantMap>()["url"].toString();
+    qDebug() << imgUrlList;
+    if(count == 0) {
+        qDebug() << "----> wordPressApi::uploadImageSlot() : Rebuilding body";
+        QDomNodeList list  = doc.documentElement().elementsByTagName("img");
+        for(int i = 0; i < list.length(); i++) {
+            QDomElement element = list.at(i).toElement();
+            element.removeAttribute("xmlns:ns0");
+            element.removeAttribute("ns0:src");
+            element.setAttribute("src", imgUrlList.at(i));
+        }
+        QString postData;
+        QTextStream ts(&postData);
+        doc.save(ts, 0);
+        post.setDescription(postData);
+        emit imagesUploaded();
+        return;
+    }
 }

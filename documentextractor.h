@@ -2,18 +2,14 @@
 #define DOCUMENTEXTRACTOR_H
 
 class QString;
-class QDomElement;
+class KoStore;
 
 class documentExtractor
 {
 public:
     documentExtractor();
 
-    QString getBody(QString & filePath);
-
-private:
-    void removeColor(QDomElement & node);
-    void removeTags(QString & body);
+    QString getBody(KoStore *store);
 };
 
 #endif // DOCUMENTEXTRACTOR_H

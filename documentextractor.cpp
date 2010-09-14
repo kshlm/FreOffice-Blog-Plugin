@@ -1,80 +1,57 @@
 #include "documentextractor.h"
 
-#include <kparts/part.h>
-#include <kparts/componentfactory.h>
-#include <kmimetype.h>
-#include <KoView.h>
-#include <KWView.h>
-#include <KoTextEditor.h>
-#include <kurl.h>
-#include <KoToolProxy.h>
-#include <KWCanvas.h>
+#include <QXmlQuery>
+#include <QFile>
+#include <QDebug>
+#include <QDomElement>
+#include <QTextStream>
 
-#include <QtXml>
-#include <QtCore>
-#include <QTextDocument>
+#include <KoStore.h>
+
+
 
 documentExtractor::documentExtractor()
 {
 }
 
-QString documentExtractor::getBody(QString &filePath)
+QString documentExtractor::getBody(KoStore *store)
 {
-    KUrl url;
-    url.setPath(filePath);
-    QString mimetype = KMimeType::findByUrl(url)->name();
-    KoDocument *kdoc = KParts::ComponentFactory::createPartInstanceFromQuery<KoDocument>(mimetype, QString::null);
-    kdoc->openUrl(url);
-    KoView *koview = kdoc->createView();
-    koview->unsetCursor();
-    KWView *kwview = qobject_cast<KWView *>(koview);
-    kwview->unsetCursor();
-    KoTextEditor *editor = qobject_cast<KoTextEditor *>(kwview->canvasBase()->toolProxy()->selection());
-    QTextDocument *tdoc = editor->document();
-    QString data = tdoc->toHtml();
+    qDebug() << "----> documentExtractor::getBody() : Extracting body";
+    QByteArray content, tmp;
+    content.append("<?xml version='1.0' encoding='UTF-8'?> <office:document xmlns:office='urn:oasis:names:tc:opendocument:xmlns:office:1.0'>");
+    store->extractFile("meta.xml",tmp);
+    tmp.remove(0,38);
+    content.append(tmp);
+    tmp.clear();
+    store->extractFile("styles.xml",tmp);
+    tmp.remove(0,38);
+    content.append(tmp);
+    tmp.clear();
+    store->extractFile("content.xml", tmp);
+    tmp.remove(0,38);
+    content.append(tmp);
+    tmp.clear();
+    content.append("</office:document>");
 
-    QDomDocument ddoc;
-    ddoc.setContent(data.toUtf8());
-    QDomElement bodyNode = ddoc.documentElement().firstChildElement("body");
-    removeColor(bodyNode);
+    QFile *odf2html = new QFile("/usr/share/freoffice/plugins/odf2html.xsl");
+    odf2html->open(QFile::ReadOnly);
 
+    QXmlQuery query2(QXmlQuery::XSLT20);
+    query2.setFocus(content);
+    query2.setQuery(odf2html);
+
+    QString html;
+    query2.evaluateTo(&html);
+
+    odf2html->close();
+
+    QDomDocument doc;
+    doc.setContent(html);
+    QDomElement bodyNode = doc.documentElement().firstChildElement("body");
     QString body;
     QTextStream ts(&body);
     bodyNode.save(ts, 0);
 
-    removeTags(body);
-
     return body;
 }
 
-void documentExtractor::removeColor(QDomElement &node)
-{
-    if(node.hasChildNodes()) {
-        QDomNodeList children = node.childNodes();
-        for(int i = 0; i < children.length(); i++) {
-            QDomNode x = children.at(i);
-            if(x.isElement()) {
-                QDomElement e = x.toElement();
-                removeColor(e);
-            }
-        }
-    }
-    if(node.hasAttribute("style")) {
-        QString style = node.attribute("style");
-        node.removeAttribute("style");
-        if(node.tagName() == "td")
-            return;
-        style = style.remove(QRegExp("color*;", Qt::CaseInsensitive, QRegExp::Wildcard));
-        style = style.remove(QRegExp("background-", Qt::CaseInsensitive, QRegExp::Wildcard));
-        node.setAttribute("style", style);
-    }
-    return;
-}
-
-void documentExtractor::removeTags(QString &body)
-{
-    body = body.right(body.size() - body.indexOf("<td>") - 4);
-    body = body.left(body.lastIndexOf("</td>"));
-    body.remove(QRegExp("<(?:span)[^>]*>", Qt::CaseInsensitive));
-    body.remove(QRegExp("</span>", Qt::CaseInsensitive));
-}

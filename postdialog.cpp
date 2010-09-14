@@ -21,7 +21,7 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QMaemo5InformationBox>
-
+#include <KoStore.h>
 
 postDialog::postDialog(QWidget *parent) :
     QDialog(parent),
@@ -118,7 +118,7 @@ void postDialog::selectorSelectedSlot(QString value)
 void postDialog::showOpenFileDialog()
 {
     QString presentPath = ("" != fileSelectEdit->text()) ? fileSelectEdit->text() : QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-    QString filename = QFileDialog::getOpenFileName(this, "Select file", presentPath, "Text Documents(*.odt *.doc)");
+    QString filename = QFileDialog::getOpenFileName(this, "Select file", presentPath, "Text Documents(*.odt)");
     if("" == filename)
         return;
     fileSelectEdit->setText(filename);
@@ -152,15 +152,16 @@ void postDialog::postButtonClicked()
     QString tags = tagsEdit->text();
     QString filename = fileSelectEdit->text();
     QString postStatus = publishCheckbox->isChecked() ? "publish" : "draft";
+    KoStore *store = KoStore::createStore(filename, KoStore::Read);
     documentExtractor ext;
-    QString description = ext.getBody(filename);
+    QString description = ext.getBody(store);
 
     if("Wordpress" == platform) {
         wordpressApi *api = new wordpressApi(blogUrl, this);
         api->setBlogid(blogId);
         api->setUsername(username);
         api->setPassword(password);
-
+        api->setKoStore(store);
         wordpressPost post;
         post.setTitle(title);
         post.setTags(tags);

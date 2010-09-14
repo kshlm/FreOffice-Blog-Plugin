@@ -5,6 +5,7 @@
 #include <QMap>
 
 class encryptSupport;
+class KoStore;
 
 namespace Ui
 {

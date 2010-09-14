@@ -1,25 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-This file is part of the KOffice project
-   Copyright (C) 2010 Pramod S G <pramod.xyle@gmail.com>
-   Copyright (C) 2010 Srihari Prasad G V <sri-hari@live.com>
-   
-   This library is free software; you can redistribute it and/or
-   modify it under the terms of the Library GNU General Public
-   version 2 of the License, or (at your option) version 3 or,
-   at the discretion of KDE e.V (which shall act as a proxy as in
-   section 14 of the GPLv3), any later version..
-
-   This library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
-
-   You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
--->
 <xsl:stylesheet xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
     xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0"
@@ -55,12 +34,12 @@ This file is part of the KOffice project
     <xsl:param xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="scale">1</xsl:param>
     <xsl:param xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="style.background-color">#A0A0A0</xsl:param>
     <xsl:param xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="CSS.debug">0</xsl:param>
-    <xsl:variable xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="linebreak">    
+    <xsl:variable xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="linebreak">
     </xsl:variable>
 
 
     <xsl:template match="office:document">
-    <xsl:apply-templates/>   
+    <xsl:apply-templates/>
     </xsl:template>
 
     <xsl:template match="/office:document">
@@ -81,9 +60,9 @@ This file is part of the KOffice project
         </xsl:template>
 
 
-        
-    
-    
+
+
+
     <xsl:template match="office:document-meta">
         <xsl:apply-templates/>
     </xsl:template>
@@ -122,8 +101,8 @@ This file is part of the KOffice project
     <xsl:template match="meta:generator">
         <meta name="generator" content="{current()}"/>
     </xsl:template>
-   
-    
+
+
     <xsl:template name="office:document-styles">
         html
         {
@@ -188,20 +167,20 @@ This file is part of the KOffice project
         {
             margin: 1em;
         }
-    
-   
+
+
     </xsl:template>
-    
+
     <xsl:template match="office:document-styles">
         <!-- office:document-styles begin -->
-        
+
         <xsl:call-template name="office:document-styles">
         </xsl:call-template>
-        <xsl:apply-templates></xsl:apply-templates>    
-            
-        <!-- office:document-styles end -->         
+        <xsl:apply-templates></xsl:apply-templates>
+
+        <!-- office:document-styles end -->
     </xsl:template>
-    
+
     <xsl:template match="office:styles">
         <xsl:text><!-- office:styles begin --></xsl:text>
         <xsl:apply-templates />
@@ -220,14 +199,14 @@ This file is part of the KOffice project
         <xsl:text><!-- office:master-styles end --></xsl:text>
     </xsl:template>
     <xsl:template match="style:default-style">
-            
+
             <xsl:text>p{</xsl:text>
             <xsl:text>}</xsl:text>
-            
+
     </xsl:template>
 
     <xsl:template match="office:styles/style:style">
-        
+
             <xsl:text>.</xsl:text><xsl:value-of select="@style:family"></xsl:value-of><xsl:text>_</xsl:text>
             <xsl:value-of select="@style:name"></xsl:value-of>
             <xsl:text>
@@ -235,9 +214,9 @@ This file is part of the KOffice project
             <xsl:apply-templates/>
             <xsl:text>}
             </xsl:text>
-              
+
     </xsl:template>
-    
+
     <xsl:template match="office:styles/style:paragraph-properties">
         <xsl:text> padding-top:</xsl:text>
         <xsl:value-of select="@fo:padding-top"></xsl:value-of><xsl:text>; </xsl:text>
@@ -253,13 +232,13 @@ This file is part of the KOffice project
         <xsl:value-of select="@fo:font-family"></xsl:value-of><xsl:text>; </xsl:text>
         <xsl:text> font-style:</xsl:text>
         <xsl:value-of select="@fo:font-style"></xsl:value-of><xsl:text>; </xsl:text>
-        
+
     </xsl:template>
-    
+
  <xsl:template match="office:document-content">
  <xsl:apply-templates/>
- </xsl:template> 
-    
+ </xsl:template>
+
   <xsl:template match="text:p">
   <p><xsl:apply-templates/></p>
   </xsl:template>
@@ -270,7 +249,7 @@ This file is part of the KOffice project
 
   <xsl:template match="table:table">
   <table border = "1">
- 
+
       <xsl:for-each select="table:table-row">
       <tr>
       <xsl:for-each select="table:table-cell">
@@ -284,7 +263,7 @@ This file is part of the KOffice project
   </table>
   </xsl:template>
   <xsl:template match="draw:frame/draw:image">
-      <xsl:element name="img">          
+      <xsl:element name="img">
           <xsl:attribute name="src">
               <xsl:value-of select="@xlink:href"/>
           </xsl:attribute>
