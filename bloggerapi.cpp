@@ -174,7 +174,6 @@ QString bloggerApi::picasaUpload(QString pathInStore)
     loop.exec() ;
 
     QByteArray data = reply->readAll();
-    qDebug() << "***************" << endl << data;
     QDomDocument doc;
     doc.setContent(data);
     QDomElement content = doc.documentElement().firstChildElement("content");
