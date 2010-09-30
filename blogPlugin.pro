@@ -19,7 +19,8 @@ TARGET = BlogPlugin
 target.path = /usr/lib/freoffice/
 files.path = /usr/share/freoffice/plugins/
 files.files = odf2html.xsl
-INSTALLS += target files
+INSTALLS += target \
+    files
 
 # Input
 HEADERS += libmaia/maiaFault.h \
