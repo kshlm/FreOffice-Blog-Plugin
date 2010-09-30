@@ -143,6 +143,7 @@ void bloggerApi::uploadImages()
             node.removeAttribute("ns0:src");
             node.removeAttribute("xmlns:ns0");
             node.setAttribute("src", imgUrl);
+            node.setAttribute("style", "max-width: 500px");
         }
         QString postData;
         QTextStream ts(&postData);
