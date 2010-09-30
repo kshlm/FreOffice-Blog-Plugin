@@ -63,6 +63,11 @@ void bloggerApi::setPost(bloggerPost & post)
     this->post = new bloggerPost(post);
 }
 
+void bloggerApi::setKoStore(KoStore *store)
+{
+    this->store = store;
+}
+
 void bloggerApi::authenticate(BloggerFunction f)
 {
     func = f;
@@ -162,17 +167,19 @@ QString bloggerApi::picasaUpload(QString pathInStore)
     request.setRawHeader("Content-Length", QString::number(imgData.length()).toUtf8());
     request.setRawHeader("Slug", pathInStore.toUtf8());
 
-    QNetworkReply *reply = manager->post(request, imgData);
+    QNetworkAccessManager m;
+    QNetworkReply *reply = m.post(request, imgData);
     QEventLoop loop;
     connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec() ;
 
     QByteArray data = reply->readAll();
+    qDebug() << "***************" << endl << data;
     QDomDocument doc;
     doc.setContent(data);
     QDomElement content = doc.documentElement().firstChildElement("content");
     QString imgUrl = content.attribute("src");
-
+    qDebug() << "URL" << imgUrl;
     return imgUrl;
 }
 

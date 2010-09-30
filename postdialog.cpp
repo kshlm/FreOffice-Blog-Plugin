@@ -196,7 +196,7 @@ void postDialog::postButtonClicked()
         api->setUsername(username);
         api->setPassword(password);
         api->setBlogUrl(blogUrl);
-
+        api->setKoStore(store);
         bloggerPost post;
         post.setTitle(title);
         foreach(QString tag, tags.split(",", QString::SkipEmptyParts))
