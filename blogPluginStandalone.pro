@@ -10,7 +10,8 @@ INCLUDEPATH += . \
     $
 QT += xml \
     network \
-    maemo5
+    maemo5 \
+    xmlpatterns
 LIBS += -lkomain \
     -lkwordprivate \
     -lcrypto

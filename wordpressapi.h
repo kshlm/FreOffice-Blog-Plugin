@@ -39,7 +39,6 @@ private:
     int blogid;
     QString username;
     QString password;
-    uint count;
     wordpressPost post;
     KoStore *store;
     QDomDocument doc;
@@ -55,14 +54,13 @@ public:
     void uploadImages();
     void uploadImage(QString pathInStore);
 private slots:
-    void continuePost();
     void getBlogidSlot(QVariant &);
     void newPostSlot(QVariant &);
     void uploadImageSlot(QVariant &);
     void xmlrpcFaultSlot(int error, const QString message);
 
 signals:
-    void imagesUploaded();
+    void imageUploaded();
     void newPostSignal(qulonglong);
     void getBlogidSignal(int);
     void wordpressError();
