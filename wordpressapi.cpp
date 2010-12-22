@@ -80,7 +80,12 @@ void wordpressApi::newPost(wordpressPost & post)
     qDebug() << "----> worpressApi::newPost()" ;
     this->post = post;
     uploadImages();
-//    connect(this, SIGNAL(imagesUploaded()),this, SLOT(continuePost()));
+
+    QString postData;
+    QTextStream ts(&postData);
+    doc.save(ts, 0);
+    post.setDescription(postData);
+
     QVariantList params;
     params << blogid << username << password << post.preparePost();
     client->call("metaWeblog.newPost", params, this, SLOT(newPostSlot(QVariant&)), this, SLOT(xmlrpcFaultSlot(int, QString)));
@@ -104,19 +109,16 @@ void wordpressApi::uploadImages()
     qDebug() << "----> wordpressApi::uploadImages()";
     doc.setContent(QString(*post.getDescription()));
     QDomNodeList list  = doc.documentElement().elementsByTagName("img");
-
     if(!list.isEmpty()) {
-        for(uint i = 0; i < list.length(); i++) {
-            QDomNode node = list.at(i);
-            uploadImage(node.toElement().attribute("ns0:src"));
+        for(int i = 0; i < list.length(); i++) {
+            QDomElement node = list.at(i).toElement();
+            uploadImage(node.attribute("ns0:src"));
             QEventLoop loop;
             connect(this, SIGNAL(imageUploaded()), &loop, SLOT(quit()));
-        }
-        for(int i = 0; i < list.length(); i++) {
-            QDomElement element = list.at(i).toElement();
-            element.removeAttribute("xmlns:ns0");
-            element.removeAttribute("ns0:src");
-            element.setAttribute("src", imgUrlList.at(i));
+            loop.exec();
+            node.removeAttribute("xmlns:ns0");
+            node.removeAttribute("ns0:src");
+            node.setAttribute("src", imgUrlList.at(i));
         }
     }
 }
