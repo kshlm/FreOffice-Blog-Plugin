@@ -130,7 +130,8 @@ void accountEditDialog::platformSelected(const QString & platform)
 
 void accountEditDialog::fillDetails(QString & blog)
 {
-    QSettings settings("freoffice", "blog-plugin");
+    QSettings settings("freoffice", "plugin-settings");
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map = settings.value(blog).value<QVariantMap>();
     QString platform = map.value("platform").toString();
@@ -219,7 +220,8 @@ void accountEditDialog::saveAccount(int blogId)
     QString password = passwordEdit->text();
     QString blogUrl = blogUrlEdit->text();
 
-    QSettings settings("freoffice", "blog-plugin", this);
+    QSettings settings("freoffice", "plugin-settings", this);
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map;
     map.insert("platform", platform);

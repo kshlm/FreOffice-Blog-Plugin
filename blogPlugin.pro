@@ -39,7 +39,8 @@ HEADERS += libmaia/maiaFault.h \
     bloggerapi.h \
     bloggerpost.h \
     encryptsupport.h \
-    postdialog.h
+    postdialog.h \
+    passphrasedialog.h
 SOURCES += libmaia/maiaFault.cpp \
     libmaia/maiaObject.cpp \
     libmaia/maiaXmlRpcClient.cpp \
@@ -55,6 +56,7 @@ SOURCES += libmaia/maiaFault.cpp \
     blogplugin.cpp \
     bloggerapi.cpp \
     bloggerpost.cpp \
-    encryptsupport.cpp
+    encryptsupport.cpp \
+    passphrasedialog.cpp
 FORMS += maindialog.ui
 OTHER_FILES += odf2html.xsl

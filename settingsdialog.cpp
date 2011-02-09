@@ -64,7 +64,8 @@ void settingsDialog::setupDialog()
 
 void settingsDialog::fillAccounts()
 {
-    QSettings settings("freoffice", "blog-plugin");
+    QSettings settings("freoffice", "plugin-settings");
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QStringList accounts = settings.childKeys();
     QStandardItemModel *model = new QStandardItemModel(this);

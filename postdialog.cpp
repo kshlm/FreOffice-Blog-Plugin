@@ -103,7 +103,8 @@ void postDialog::setupDialog()
 
 void postDialog::fillAccounts()
 {
-    QSettings settings("freoffice", "blog-plugin");
+    QSettings settings("freoffice", "plugin-settings");
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QStringList accounts = settings.childKeys();
     QStandardItemModel *model = new QStandardItemModel(this);
@@ -120,7 +121,8 @@ void postDialog::fillAccounts()
 
 void postDialog::selectorSelectedSlot(QString value)
 {
-    QSettings settings("freoffice", "blog-plugin");
+    QSettings settings("freoffice", "plugin-settings");
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap m = settings.value(value).value<QVariantMap>();
     QString platform = m.value("platform").toString();
@@ -156,7 +158,8 @@ void postDialog::postButtonClicked()
     this->setWindowTitle("Preparing post");
 
     QString blog = accountButton->valueText();
-    QSettings settings("freoffice", "blog-plugin");
+    QSettings settings("freoffice", "plugin-settings");
+    settings.beginGroup("blog-plugin");
     settings.beginGroup("Accounts");
     QVariantMap map = settings.value(blog).value<QVariantMap>();
     QString platform = map.value("platform").toString();
